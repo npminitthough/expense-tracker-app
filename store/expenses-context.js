@@ -11,7 +11,7 @@ function expensesReducer(state, action) {
   switch (action.type) {
     case "ADD":
       const id = new Date().toString() + Math.random().toString();
-      return [{ ...action.payload }, ...state];
+      return [{ id, ...action.payload }, ...state];
     case "UPDATE":
       const indexOfItemToUpdate = state.findIndex(
         (el) => el.id === action.payload.id
@@ -23,7 +23,7 @@ function expensesReducer(state, action) {
 
       return newExpenses;
     case "DELETE":
-      return state.filter((el) => el.id !== action.payload.id);
+      return state.filter((el) => el.id !== action.payload);
     default:
       return state;
   }
@@ -44,7 +44,19 @@ export default function ExpensesContextProvider({ children }) {
     dispatch({ type: "UPDATE", payload: { id, data: expenseData } });
   }
 
-  return <ExpensesContext.Provider>{children}</ExpensesContext.Provider>;
+  // bundle data and functions together to expose them to components through the Provider.
+  const value = {
+    expenses: expensesState,
+    addExpense,
+    deleteExpense,
+    updateExpense,
+  };
+
+  return (
+    <ExpensesContext.Provider value={value}>
+      {children}
+    </ExpensesContext.Provider>
+  );
 }
 
 const DUMMY_EXPENSES = [
@@ -88,12 +100,18 @@ const DUMMY_EXPENSES = [
     id: "e7",
     description: "Mangoes",
     amount: 4.0,
-    date: new Date("2022-10-02"),
+    date: new Date("2022-10-31"),
   },
   {
     id: "e8",
     description: "Chocolate",
     amount: 2.99,
-    date: new Date("2022-10-04"),
+    date: new Date("2022-10-31"),
+  },
+  {
+    id: "e9",
+    description: "Crisps",
+    amount: 2.99,
+    date: new Date("2022-11-01"),
   },
 ];

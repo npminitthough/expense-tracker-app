@@ -1,12 +1,16 @@
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import IconButton from "../components/ui/IconButton";
 import Button from "../components/ui/Button";
 import { GlobalStyles } from "../constants/styles";
 
+import { ExpensesContext } from "../store/expenses-context";
+
 export default function ManageExpense({ route, navigation }) {
-  const editedExpenseId = route.params?.expenseId; //route prop provided by react-navigation
-  const isEditing = !!editedExpenseId;
+  const expensesCtx = useContext(ExpensesContext);
+  const currentExpenseId = route.params?.expenseId; //route prop provided by react-navigation
+  console.log(currentExpenseId);
+  const isEditing = !!currentExpenseId;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -16,7 +20,7 @@ export default function ManageExpense({ route, navigation }) {
   }, [navigation, isEditing]);
 
   function deleteExpenseHandler() {
-    console.log("del");
+    expensesCtx.deleteExpense(currentExpenseId);
     navigation.goBack();
   }
 
@@ -24,6 +28,19 @@ export default function ManageExpense({ route, navigation }) {
     navigation.goBack();
   }
   function confirmHandler() {
+    if (isEditing) {
+      expensesCtx.updateExpense(currentExpenseId, {
+        description: "test-update",
+        amount: 15.99,
+        date: new Date("2022-09-22"),
+      });
+    } else {
+      expensesCtx.addExpense({
+        description: "test-add",
+        amount: 19.99,
+        date: new Date("2022-09-21"),
+      });
+    }
     navigation.goBack();
   }
   return (
